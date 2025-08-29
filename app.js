@@ -144,6 +144,14 @@ class SnackCalculator {
     }
     
     items.forEach((item, index) => {
+      // 如果不是第一個項目，先添加分隔符號
+      if (index > 0) {
+        const separator = document.createElement("div");
+        separator.className = "multiplier";
+        separator.textContent = "＋";
+        container.appendChild(separator);
+      }
+      
       const unit = document.createElement("div");
       unit.className = "unit";
       
@@ -172,14 +180,6 @@ class SnackCalculator {
       unit.appendChild(priceBox);
       unit.appendChild(multiplier);
       unit.appendChild(quantity);
-      
-      // 添加分隔符號（除了最後一個）
-      if (index < items.length - 1) {
-        const separator = document.createElement("div");
-        separator.className = "multiplier";
-        separator.textContent = "＋";
-        container.appendChild(separator);
-      }
       
       container.appendChild(unit);
     });
