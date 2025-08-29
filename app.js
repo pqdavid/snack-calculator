@@ -60,6 +60,46 @@ class SnackCalculator {
     const container = document.getElementById("price-options");
     const prices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
     
+    // 建立全選 checkbox
+    const selectAllContainer = document.createElement("div");
+    selectAllContainer.className = "checkbox select-all";
+    
+    const selectAllInput = document.createElement("input");
+    selectAllInput.type = "checkbox";
+    selectAllInput.id = "select-all";
+    selectAllInput.checked = true; // 預設全選
+    
+    const selectAllLabel = document.createElement("label");
+    selectAllLabel.htmlFor = "select-all";
+    selectAllLabel.textContent = "全選";
+    
+    selectAllContainer.appendChild(selectAllInput);
+    selectAllContainer.appendChild(selectAllLabel);
+    
+    // 全選 checkbox 事件監聽
+    selectAllInput.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      
+      // 更新所有價格 checkbox
+      prices.forEach(price => {
+        const priceInput = document.getElementById(`price-${price}`);
+        if (priceInput) {
+          priceInput.checked = isChecked;
+          if (isChecked) {
+            this.selectedPrices.add(price);
+          } else {
+            this.selectedPrices.delete(price);
+          }
+        }
+      });
+      
+      this.updateResults();
+    });
+    
+    // 將全選 checkbox 放在最前面
+    container.appendChild(selectAllContainer);
+    
+    // 建立所有價格 checkbox
     prices.forEach(price => {
       const checkbox = document.createElement("div");
       checkbox.className = "checkbox";
@@ -83,6 +123,10 @@ class SnackCalculator {
         } else {
           this.selectedPrices.delete(price);
         }
+        
+        // 檢查是否需要取消全選
+        this.updateSelectAllState();
+        
         this.updateResults();
       });
       
@@ -93,6 +137,23 @@ class SnackCalculator {
       
       container.appendChild(checkbox);
     });
+    
+    // 初始化全選狀態
+    this.updateSelectAllState();
+  }
+  
+  updateSelectAllState() {
+    const selectAllInput = document.getElementById("select-all");
+    const prices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
+    
+    // 檢查是否所有價格都被選中
+    const allSelected = prices.every(price => this.selectedPrices.has(price));
+    
+    // 更新全選 checkbox 狀態
+    if (selectAllInput) {
+      selectAllInput.checked = allSelected;
+      selectAllInput.indeterminate = !allSelected && this.selectedPrices.size > 0;
+    }
   }
   
   calculateOptimalPurchase() {
