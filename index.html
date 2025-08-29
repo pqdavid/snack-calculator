@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小廢物清算機｜零食精算師</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app" data-node-id="1:2">
+    <section class="top" aria-labelledby="amount-label">
+      <div class="amount-input">
+        <span class="icon-arrow" aria-hidden="true">➔</span>
+        <label id="amount-label" class="sr-only" for="amount">請輸入零食金剩餘金額</label>
+        <input id="amount" inputmode="numeric" pattern="[0-9]*" placeholder="請輸入零食金剩餘金額" aria-describedby="amount-help" />
+      </div>
+      <div class="pick" role="group" aria-labelledby="pick-label">
+        <div id="pick-label" class="pick-title">零食品項金額有：</div>
+        <div class="checkboxes" id="price-options"></div>
+      </div>
+      <button id="calc" class="btn primary" type="button">
+        <span>零食精算師</span>
+        <span class="icon-arrow-right" aria-hidden="true">➜</span>
+      </button>
+    </section>
+
+    <section class="panel">
+      <div class="toggle" role="tablist" aria-label="計算模式">
+        <button id="mode-max-items" class="toggle-btn is-active" role="tab" aria-selected="true">買最多品項</button>
+        <button id="mode-min-left" class="toggle-btn" role="tab" aria-selected="false">剩餘最少錢</button>
+      </div>
+
+      <div class="list" aria-live="polite">
+        <div class="list-title">你可以購買：</div>
+        <div id="result-list" class="units"></div>
+      </div>
+
+      <div class="remain">
+        <div class="remain-title">剩餘</div>
+        <div id="remain-price" class="price-box">
+          <div class="price-val">0</div>
+          <div class="price-unit">元</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
