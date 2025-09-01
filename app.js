@@ -4,6 +4,7 @@ class SnackCalculator {
     this.amount = 0;
     this.selectedPrices = new Set();
     this.mode = "max-items"; // "max-items" or "min-left"
+    this.theme = this.getInitialTheme();
     
     this.init();
   }
@@ -12,6 +13,7 @@ class SnackCalculator {
     this.setupEventListeners();
     this.renderPriceOptions();
     this.updateResults();
+    this.applyTheme(this.theme);
   }
   
   setupEventListeners() {
@@ -39,6 +41,13 @@ class SnackCalculator {
     minLeftBtn.addEventListener("click", () => {
       this.setMode("min-left");
     });
+
+    // 主題切換
+    const themeToggle = document.getElementById("theme-toggle");
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = this.theme === "dark" ? "light" : "dark";
+      this.setTheme(nextTheme);
+    });
   }
   
   setMode(mode) {
@@ -54,6 +63,30 @@ class SnackCalculator {
     minLeftBtn.setAttribute("aria-selected", mode === "min-left");
     
     this.updateResults();
+  }
+
+  // 主題：初始化與切換
+  getInitialTheme() {
+    const stored = localStorage.getItem("snack_theme");
+    if (stored === "light" || stored === "dark") return stored;
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? "dark" : "light";
+  }
+
+  applyTheme(theme) {
+    const root = document.documentElement;
+    root.setAttribute("data-theme", theme);
+    this.theme = theme;
+    const toggle = document.getElementById("theme-toggle");
+    if (toggle) {
+      toggle.setAttribute("aria-pressed", theme === "dark");
+      toggle.textContent = theme === "dark" ? "🌞 亮色" : "🌙 暗色";
+    }
+  }
+
+  setTheme(theme) {
+    localStorage.setItem("snack_theme", theme);
+    this.applyTheme(theme);
   }
   
   renderPriceOptions() {

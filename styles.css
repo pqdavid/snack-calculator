@@ -24,6 +24,21 @@
   --sizing-default: 18px;
 }
 
+/* 暗黑主題覆寫 */
+:root[data-theme="dark"] {
+  --bg-wallpaper: #0f1115;
+  --bg-default: #171a21;
+  --bg-tableHeaderDefault: #1f2430;
+  
+  --text-default-signage: #9aa4b2;
+  --text-default-disable: #556070;
+  --text-default: #e5eaf2;
+  
+  --border-default-inner: #2b3240;
+  --icon-inverse: #ffffff;
+  --primary: #5aa2ff;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -205,6 +220,14 @@ body {
   font-family: inherit;
 }
 
+.btn.ghost {
+  background-color: transparent;
+  color: var(--text-default);
+  border: 1px solid var(--border-default-inner);
+  width: auto;
+  min-width: 0;
+}
+
 .btn:hover {
   opacity: 0.9;
 }
@@ -215,6 +238,11 @@ body {
 
 .icon-arrow-right {
   font-size: var(--sizing-default);
+}
+
+/* 主題切換按鈕位置 */
+.theme-toggle {
+  align-self: flex-end;
 }
 
 /* Panel Section */
@@ -232,6 +260,14 @@ body {
   border-radius: 24px 24px 0 0;
   box-shadow: 0px 0px 24px 0px rgba(154, 154, 154, 0.35);
   width: 100%;
+}
+
+.no-results {
+  width: 100%;
+  color: var(--text-default-signage);
+  background-color: var(--bg-tableHeaderDefault);
+  padding: var(--gap-p-default);
+  border-radius: var(--card-default);
 }
 
 .toggle {
