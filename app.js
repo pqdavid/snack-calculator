@@ -233,7 +233,7 @@ class SnackCalculator {
     container.innerHTML = "";
     
     if (items.length === 0) {
-      container.innerHTML = "<div class=\"no-results\">無法購買任何品項</div>";
+      container.innerHTML = "<div class=\"no-results\" role=\"status\" aria-live=\"polite\">無法購買任何品項</div>";
       return;
     }
     
