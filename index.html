@@ -12,19 +12,42 @@
 <body>
   <main class="app" data-node-id="1:2">
     <section class="top" aria-labelledby="amount-label">
-      <button id="theme-toggle" class="btn ghost theme-toggle" type="button" aria-pressed="false" aria-label="切換主題">🌗 主題</button>
-      <div class="amount-input">
-        <span class="icon-arrow" aria-hidden="true">➔</span>
-        <label id="amount-label" class="sr-only" for="amount">請輸入零食金剩餘金額</label>
-        <input id="amount" inputmode="numeric" pattern="[0-9]*" placeholder="請輸入零食金剩餘金額" aria-describedby="amount-help" />
+      <div class="title">
+        <div class="amount-input">
+          <div class="icon-keyboard" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M6 16h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <label id="amount-label" class="sr-only" for="amount">請輸入零食金剩餘金額</label>
+          <input id="amount" inputmode="numeric" pattern="[0-9]*" placeholder="輸入剩餘金額" aria-describedby="amount-help" />
+        </div>
       </div>
+      
       <div class="pick" role="group" aria-labelledby="pick-label">
         <div id="pick-label" class="pick-title">零食品項金額有：</div>
-        <div class="checkboxes" id="price-options"></div>
+        <div class="checkboxes-container">
+          <div class="checkbox select-all">
+            <input type="checkbox" id="select-all" />
+            <label for="select-all">全選</label>
+          </div>
+          <div class="divider"></div>
+          <div class="checkboxes" id="price-options"></div>
+        </div>
       </div>
+      
       <button id="calc" class="btn primary" type="button">
         <span>零食精算師</span>
-        <span class="icon-arrow-right" aria-hidden="true">➜</span>
+        <div class="icon-cookie" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 10a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 10a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 14a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       </button>
     </section>
 
@@ -45,6 +68,14 @@
           <div class="price-val">0</div>
           <div class="price-unit">元</div>
         </div>
+      </div>
+      
+      <!-- Loading 動畫 -->
+      <div id="loading" class="loading-container" style="display: none;">
+        <div class="loading-spinner">
+          <div class="loading-ring"></div>
+        </div>
+        <div class="loading-text">計算中...</div>
       </div>
     </section>
   </main>

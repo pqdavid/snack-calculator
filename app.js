@@ -4,7 +4,6 @@ class SnackCalculator {
     this.amount = 0;
     this.selectedPrices = new Set();
     this.mode = "max-items"; // "max-items" or "min-left"
-    this.theme = this.getInitialTheme();
     
     this.init();
   }
@@ -13,7 +12,6 @@ class SnackCalculator {
     this.setupEventListeners();
     this.renderPriceOptions();
     this.updateResults();
-    this.applyTheme(this.theme);
   }
   
   setupEventListeners() {
@@ -27,7 +25,7 @@ class SnackCalculator {
     // 計算按鈕
     const calcBtn = document.getElementById("calc");
     calcBtn.addEventListener("click", () => {
-      this.updateResults();
+      this.updateResultsWithLoading();
     });
     
     // 模式切換
@@ -41,12 +39,27 @@ class SnackCalculator {
     minLeftBtn.addEventListener("click", () => {
       this.setMode("min-left");
     });
-
-    // 主題切換
-    const themeToggle = document.getElementById("theme-toggle");
-    themeToggle.addEventListener("click", () => {
-      const nextTheme = this.theme === "dark" ? "light" : "dark";
-      this.setTheme(nextTheme);
+    
+    // 全選 checkbox
+    const selectAllInput = document.getElementById("select-all");
+    selectAllInput.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      const prices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
+      
+      // 更新所有價格 checkbox
+      prices.forEach(price => {
+        const priceInput = document.getElementById(`price-${price}`);
+        if (priceInput) {
+          priceInput.checked = isChecked;
+          if (isChecked) {
+            this.selectedPrices.add(price);
+          } else {
+            this.selectedPrices.delete(price);
+          }
+        }
+      });
+      
+      this.updateResults();
     });
   }
   
@@ -64,73 +77,47 @@ class SnackCalculator {
     
     this.updateResults();
   }
-
-  // 主題：初始化與切換
-  getInitialTheme() {
-    const stored = localStorage.getItem("snack_theme");
-    if (stored === "light" || stored === "dark") return stored;
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? "dark" : "light";
-  }
-
-  applyTheme(theme) {
-    const root = document.documentElement;
-    root.setAttribute("data-theme", theme);
-    this.theme = theme;
-    const toggle = document.getElementById("theme-toggle");
-    if (toggle) {
-      toggle.setAttribute("aria-pressed", theme === "dark");
-      toggle.textContent = theme === "dark" ? "🌞 亮色" : "🌙 暗色";
+  
+  // Loading 動畫控制
+  showLoading() {
+    const loading = document.getElementById("loading");
+    if (loading) {
+      loading.style.display = "flex";
     }
   }
-
-  setTheme(theme) {
-    localStorage.setItem("snack_theme", theme);
-    this.applyTheme(theme);
+  
+  hideLoading() {
+    const loading = document.getElementById("loading");
+    if (loading) {
+      loading.style.display = "none";
+    }
+  }
+  
+  // 隱藏結果區域
+  hideResults() {
+    const toggle = document.querySelector('.toggle');
+    const list = document.querySelector('.list');
+    const remain = document.querySelector('.remain');
+    
+    if (toggle) toggle.style.display = 'none';
+    if (list) list.style.display = 'none';
+    if (remain) remain.style.display = 'none';
+  }
+  
+  // 顯示結果區域
+  showResults() {
+    const toggle = document.querySelector('.toggle');
+    const list = document.querySelector('.list');
+    const remain = document.querySelector('.remain');
+    
+    if (toggle) toggle.style.display = 'flex';
+    if (list) list.style.display = 'flex';
+    if (remain) remain.style.display = 'flex';
   }
   
   renderPriceOptions() {
     const container = document.getElementById("price-options");
     const prices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
-    
-    // 建立全選 checkbox
-    const selectAllContainer = document.createElement("div");
-    selectAllContainer.className = "checkbox select-all";
-    
-    const selectAllInput = document.createElement("input");
-    selectAllInput.type = "checkbox";
-    selectAllInput.id = "select-all";
-    selectAllInput.checked = true; // 預設全選
-    
-    const selectAllLabel = document.createElement("label");
-    selectAllLabel.htmlFor = "select-all";
-    selectAllLabel.textContent = "全選";
-    
-    selectAllContainer.appendChild(selectAllInput);
-    selectAllContainer.appendChild(selectAllLabel);
-    
-    // 全選 checkbox 事件監聽
-    selectAllInput.addEventListener("change", (e) => {
-      const isChecked = e.target.checked;
-      
-      // 更新所有價格 checkbox
-      prices.forEach(price => {
-        const priceInput = document.getElementById(`price-${price}`);
-        if (priceInput) {
-          priceInput.checked = isChecked;
-          if (isChecked) {
-            this.selectedPrices.add(price);
-          } else {
-            this.selectedPrices.delete(price);
-          }
-        }
-      });
-      
-      this.updateResults();
-    });
-    
-    // 將全選 checkbox 放在最前面
-    container.appendChild(selectAllContainer);
     
     // 建立所有價格 checkbox
     prices.forEach(price => {
@@ -222,10 +209,29 @@ class SnackCalculator {
     return { items, remaining };
   }
   
+  // 一般更新結果（用於輸入和模式切換）
   updateResults() {
     const result = this.calculateOptimalPurchase();
     this.renderResults(result.items);
     this.updateRemaining(result.remaining);
+  }
+  
+  // 帶 loading 的更新結果（用於按鈕點擊）
+  async updateResultsWithLoading() {
+    // 隱藏結果區域並顯示 loading
+    this.hideResults();
+    this.showLoading();
+    
+    // 模擬計算延遲（讓 loading 動畫有時間顯示）
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const result = this.calculateOptimalPurchase();
+    this.renderResults(result.items);
+    this.updateRemaining(result.remaining);
+    
+    // 隱藏 loading 並顯示結果
+    this.hideLoading();
+    this.showResults();
   }
   
   renderResults(items) {

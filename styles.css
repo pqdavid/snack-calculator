@@ -16,7 +16,9 @@
   --text-default: #3a3a3a;
   
   --border-default-inner: #e0e0e0;
+  --border-default-outer: #bdbdbd;
   --icon-inverse: #ffffff;
+  --icon-default: #3a3a3a;
   --primary: #4488ff;
   
   --card-default: 12px;
@@ -24,20 +26,7 @@
   --sizing-default: 18px;
 }
 
-/* 暗黑主題覆寫 */
-:root[data-theme="dark"] {
-  --bg-wallpaper: #0f1115;
-  --bg-default: #171a21;
-  --bg-tableHeaderDefault: #1f2430;
-  
-  --text-default-signage: #9aa4b2;
-  --text-default-disable: #556070;
-  --text-default: #e5eaf2;
-  
-  --border-default-inner: #2b3240;
-  --icon-inverse: #ffffff;
-  --primary: #5aa2ff;
-}
+
 
 * {
   box-sizing: border-box;
@@ -58,6 +47,9 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 
 .sr-only {
@@ -80,9 +72,18 @@ body {
   align-items: end;
   justify-content: start;
   padding: 48px 24px 24px;
-  width: 100%;
+  width: calc(100% - 48px);
   flex-shrink: 0;
-  margin: 0 24px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.title {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: start;
+  width: 100%;
 }
 
 .amount-input {
@@ -98,10 +99,12 @@ body {
   position: relative;
 }
 
-.icon-arrow {
+.icon-keyboard {
   font-size: var(--sizing-default);
-  color: var(--text-default-signage);
-  transform: rotate(0deg);
+  color: var(--icon-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .amount-input input {
@@ -112,6 +115,7 @@ body {
   line-height: 24px;
   color: var(--text-default);
   outline: none;
+  font-family: inherit;
 }
 
 .amount-input input::placeholder {
@@ -134,18 +138,34 @@ body {
   width: 100%;
 }
 
-.checkboxes {
+.checkboxes-container {
   background-color: var(--bg-default);
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 12px;
   align-items: start;
   justify-content: start;
   padding: var(--gap-p-default);
   border-radius: var(--card-default);
   width: 100%;
   position: relative;
-  border: 1px solid var(--border-default-inner);
+  border: 1px solid var(--border-default-outer);
+}
+
+.divider {
+  height: 0;
+  width: 100%;
+  border-bottom: 1px solid var(--border-default-inner);
+  margin: 0;
+}
+
+.checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: start;
+  justify-content: start;
+  width: 100%;
 }
 
 .checkbox {
@@ -192,14 +212,13 @@ body {
 
 .checkbox.select-all {
   width: 100%;
-  margin-bottom: 8px;
-  padding: 8px 0 8px 30px;
-  border-bottom: 1px solid var(--border-default-inner);
+  margin-bottom: 0;
+  padding: 6px 0 6px 30px;
 }
 
 .checkbox.select-all label {
-  font-weight: 700;
-  color: var(--primary);
+  font-weight: 400;
+  color: var(--text-default);
 }
 
 .btn {
@@ -219,6 +238,7 @@ body {
   font-size: 16px;
   line-height: 24px;
   font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .btn.ghost {
@@ -237,13 +257,12 @@ body {
   transform: translateY(1px);
 }
 
-.icon-arrow-right {
+.icon-cookie {
   font-size: var(--sizing-default);
-}
-
-/* 主題切換按鈕位置 */
-.theme-toggle {
-  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--icon-inverse);
 }
 
 /* Panel Section */
@@ -422,12 +441,61 @@ body {
   white-space: nowrap;
 }
 
+/* Loading 動畫樣式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  padding: 32px 0;
+  margin: auto;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+
+.loading-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-default-inner);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  animation: loading-spin 1s linear infinite;
+}
+
+@keyframes loading-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-default-signage);
+  text-align: center;
+  margin: auto;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
+  .app {
+    max-width: 100%;
+  }
+  
   .top {
-    width: 100%;
+    width: calc(100% - 32px);
     padding: 24px 16px 16px;
-    margin: 0 16px;
+    max-width: none;
   }
   
   .panel {
@@ -447,5 +515,9 @@ body {
   #remain-price .price-val {
     font-size: 32px;
     line-height: 36px;
+  }
+  
+  .loading-container {
+    padding: 24px 0;
   }
 }
