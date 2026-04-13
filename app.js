@@ -99,30 +99,38 @@ class SnackCalculator {
     this.updateResults();
   }
 
-  showLoading() {
-    const loading = document.getElementById("loading");
-    if (loading) loading.style.display = "flex";
-  }
-
-  hideLoading() {
-    const loading = document.getElementById("loading");
-    if (loading) loading.style.display = "none";
-  }
-
-  hideResults() {
+  showPanelWithLoading() {
     const panel = document.querySelector(".panel");
-    if (panel) panel.style.display = "none";
+    const loading = document.getElementById("loading");
+    const results = document.getElementById("panel-results");
+
+    // 顯示 loading，隱藏結果
+    if (loading) loading.style.display = "flex";
+    if (results) results.classList.remove("is-visible");
+
+    // 面板從下往上滑入
+    if (panel) {
+      panel.style.display = "flex";
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          panel.classList.add("is-visible");
+        });
+      });
+    }
   }
 
   showResults() {
-    const panel = document.querySelector(".panel");
-    const toggle = document.querySelector(".toggle");
-    const list = document.querySelector(".list");
-    const remain = document.querySelector(".remain");
-    if (panel) panel.style.display = "flex";
-    if (toggle) toggle.style.display = "flex";
-    if (list) list.style.display = "flex";
-    if (remain) remain.style.display = "flex";
+    const loading = document.getElementById("loading");
+    const results = document.getElementById("panel-results");
+
+    if (loading) loading.style.display = "none";
+
+    // 結果淡入
+    if (results) {
+      requestAnimationFrame(() => {
+        results.classList.add("is-visible");
+      });
+    }
   }
 
   renderPricePills() {
@@ -258,8 +266,7 @@ class SnackCalculator {
   }
 
   async updateResultsWithLoading() {
-    this.hideResults();
-    this.showLoading();
+    this.showPanelWithLoading();
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -267,7 +274,6 @@ class SnackCalculator {
     this.renderResults(result.items);
     this.updateRemaining(result.remaining);
 
-    this.hideLoading();
     this.showResults();
   }
 

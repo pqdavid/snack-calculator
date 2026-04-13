@@ -71,32 +71,32 @@
 
     </section>
 
-    <section class="panel" style="display: none;">
-      <div class="toggle" role="tablist" aria-label="計算模式">
-        <button id="mode-max-variety" class="toggle-btn is-active" role="tab" aria-selected="true">買最多樣</button>
-        <button id="mode-min-left" class="toggle-btn" role="tab" aria-selected="false">剩餘最少錢</button>
-        <button id="mode-max-types" class="toggle-btn" role="tab" aria-selected="false">買最多種</button>
-      </div>
-
-      <div class="list" aria-live="polite">
-        <div class="list-title">你可以購買：</div>
-        <div id="result-list" class="units"></div>
-      </div>
-
-      <div class="remain">
-        <div class="remain-title">剩餘</div>
-        <div id="remain-price" class="price-box">
-          <div class="price-val">0</div>
-          <div class="price-unit">元</div>
-        </div>
-      </div>
-
+    <section class="panel">
       <!-- Loading 動畫 -->
-      <div id="loading" class="loading-container" style="display: none;">
-        <div class="loading-spinner">
-          <div class="loading-ring"></div>
+      <div id="loading" class="loading-container">
+        <div class="loading-dot"></div>
+      </div>
+
+      <!-- 結果內容 -->
+      <div class="panel-results" id="panel-results">
+        <div class="toggle" role="tablist" aria-label="計算模式">
+          <button id="mode-max-variety" class="toggle-btn is-active" role="tab" aria-selected="true">買最多樣</button>
+          <button id="mode-min-left" class="toggle-btn" role="tab" aria-selected="false">剩餘最少錢</button>
+          <button id="mode-max-types" class="toggle-btn" role="tab" aria-selected="false">買最多種</button>
         </div>
-        <div class="loading-text">計算中...</div>
+
+        <div class="list" aria-live="polite">
+          <div class="list-title">你可以購買：</div>
+          <div id="result-list" class="units"></div>
+        </div>
+
+        <div class="remain">
+          <div class="remain-title">剩餘</div>
+          <div id="remain-price" class="price-box">
+            <div class="price-val">0</div>
+            <div class="price-unit">元</div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
