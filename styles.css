@@ -181,6 +181,13 @@ body {
   display: flex;
 }
 
+/* 觸控裝置：直接顯示 × 按鈕 */
+@media (hover: none) {
+  .big-price-remove {
+    display: flex;
+  }
+}
+
 .big-price-val {
   font-weight: 700;
   font-size: 42px;
