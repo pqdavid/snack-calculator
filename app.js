@@ -20,7 +20,6 @@ class SnackCalculator {
     // 金額輸入
     document.getElementById("amount").addEventListener("input", (e) => {
       this.amount = parseInt(e.target.value) || 0;
-      this.updateResults();
     });
 
     // 快速查詢按鈕
@@ -70,7 +69,6 @@ class SnackCalculator {
 
     this.renderPricePills();
     this.renderSelectedBoard();
-    this.updateResults();
   }
 
   togglePrice(price) {
@@ -81,7 +79,6 @@ class SnackCalculator {
     }
     this.renderPricePills();
     this.renderSelectedBoard();
-    this.updateResults();
   }
 
   setMode(mode) {
