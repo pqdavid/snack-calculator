@@ -12,49 +12,70 @@
 <body>
   <main class="app" data-node-id="1:2">
     <section class="top" aria-labelledby="amount-label">
+
+      <!-- 標題列：金額輸入 + 快速查詢 -->
       <div class="title">
         <div class="amount-input">
-          <div class="icon-keyboard" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M6 16h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <div class="icon-arrow" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M10 4.5L15 9L10 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
           <label id="amount-label" class="sr-only" for="amount">請輸入零食金剩餘金額</label>
-          <input id="amount" inputmode="numeric" pattern="[0-9]*" placeholder="輸入剩餘金額" aria-describedby="amount-help" />
+          <input id="amount" inputmode="numeric" pattern="[0-9]*" placeholder="輸入剩餘金額" />
         </div>
+        <button id="quick-query" class="btn btn-outline" type="button">快速查詢</button>
       </div>
-      
-      <div class="pick" role="group" aria-labelledby="pick-label">
-        <div id="pick-label" class="pick-title">零食品項金額有：</div>
-        <div class="checkboxes-container">
-          <div class="checkbox select-all">
-            <input type="checkbox" id="select-all" />
-            <label for="select-all">全選</label>
+
+      <!-- 內容區：已選取 + 選擇卡片 -->
+      <div class="content">
+
+        <!-- 已選取的價格 -->
+        <div class="selected-board">
+          <p class="selected-label">你選取了</p>
+          <div class="selected-list" id="selected-list" aria-live="polite" aria-label="已選取的零食價格"></div>
+        </div>
+
+        <!-- 選擇卡片 -->
+        <div class="pick-box">
+
+          <!-- 預設品項列 -->
+          <div class="pick-row pick-row--border">
+            <div class="row-name">預設品項</div>
+            <div class="pills-list" id="price-pills" role="group" aria-label="零食品項金額選擇"></div>
           </div>
-          <div class="divider"></div>
-          <div class="checkboxes" id="price-options"></div>
+
+          <!-- 手動新增列 -->
+          <div class="pick-row">
+            <div class="row-name">手動新增</div>
+            <div class="manual-add">
+              <div class="manual-input-wrap">
+                <input id="custom-price" inputmode="numeric" pattern="[0-9]*" placeholder="請輸入價格" aria-label="手動新增零食價格" />
+              </div>
+              <button id="add-price" class="btn btn-outline btn-sm" type="button">新增</button>
+            </div>
+          </div>
+
         </div>
       </div>
-      
-      <button id="calc" class="btn primary" type="button">
-        <span>零食精算師</span>
-        <div class="icon-cookie" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M16 10a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 10a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 14a2 2 0 1 0 2 2 2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+
+      <!-- 計算按鈕 -->
+      <button id="calc" class="btn btn-primary btn-full" type="button">
+        <span>零食精算GO</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 12L15.5 15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
       </button>
+
     </section>
 
-    <section class="panel">
+    <section class="panel" style="display: none;">
       <div class="toggle" role="tablist" aria-label="計算模式">
-        <button id="mode-max-items" class="toggle-btn is-active" role="tab" aria-selected="true">買最多品項</button>
+        <button id="mode-max-variety" class="toggle-btn is-active" role="tab" aria-selected="true">買最多樣</button>
         <button id="mode-min-left" class="toggle-btn" role="tab" aria-selected="false">剩餘最少錢</button>
+        <button id="mode-max-types" class="toggle-btn" role="tab" aria-selected="false">買最多種</button>
       </div>
 
       <div class="list" aria-live="polite">
@@ -69,7 +90,7 @@
           <div class="price-unit">元</div>
         </div>
       </div>
-      
+
       <!-- Loading 動畫 -->
       <div id="loading" class="loading-container" style="display: none;">
         <div class="loading-spinner">

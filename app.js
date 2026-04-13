@@ -2,289 +2,324 @@
 class SnackCalculator {
   constructor() {
     this.amount = 0;
-    this.selectedPrices = new Set();
-    this.mode = "max-items"; // "max-items" or "min-left"
-    
+    this.selectedPrices = new Set([21, 23, 32, 33, 34, 35, 41]);
+    this.mode = "max-variety";
+    this.presetPrices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
+    this.customPrices = [];
+
     this.init();
   }
-  
+
   init() {
     this.setupEventListeners();
-    this.renderPriceOptions();
-    this.updateResults();
+    this.renderPricePills();
+    this.renderSelectedBoard();
   }
-  
+
   setupEventListeners() {
     // 金額輸入
-    const amountInput = document.getElementById("amount");
-    amountInput.addEventListener("input", (e) => {
+    document.getElementById("amount").addEventListener("input", (e) => {
       this.amount = parseInt(e.target.value) || 0;
       this.updateResults();
     });
-    
+
+    // 快速查詢按鈕
+    document.getElementById("quick-query").addEventListener("click", () => {
+      window.open("https://pay.yallvend.com/app/point_check/point_check?key=54897e8885489ca705c9dc4cd36abeffd22bfa86b69e7fd80ee902576d9b9ea5&country=tw", "_blank");
+    });
+
     // 計算按鈕
-    const calcBtn = document.getElementById("calc");
-    calcBtn.addEventListener("click", () => {
+    document.getElementById("calc").addEventListener("click", () => {
       this.updateResultsWithLoading();
     });
-    
+
     // 模式切換
-    const maxItemsBtn = document.getElementById("mode-max-items");
-    const minLeftBtn = document.getElementById("mode-min-left");
-    
-    maxItemsBtn.addEventListener("click", () => {
-      this.setMode("max-items");
+    document.getElementById("mode-max-variety").addEventListener("click", () => {
+      this.setMode("max-variety");
     });
-    
-    minLeftBtn.addEventListener("click", () => {
+
+    document.getElementById("mode-min-left").addEventListener("click", () => {
       this.setMode("min-left");
     });
-    
-    // 全選 checkbox
-    const selectAllInput = document.getElementById("select-all");
-    selectAllInput.addEventListener("change", (e) => {
-      const isChecked = e.target.checked;
-      const prices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
-      
-      // 更新所有價格 checkbox
-      prices.forEach(price => {
-        const priceInput = document.getElementById(`price-${price}`);
-        if (priceInput) {
-          priceInput.checked = isChecked;
-          if (isChecked) {
-            this.selectedPrices.add(price);
-          } else {
-            this.selectedPrices.delete(price);
-          }
-        }
-      });
-      
-      this.updateResults();
+
+    document.getElementById("mode-max-types").addEventListener("click", () => {
+      this.setMode("max-types");
+    });
+
+    // 手動新增
+    document.getElementById("add-price").addEventListener("click", () => {
+      this.addCustomPrice();
+    });
+
+    document.getElementById("custom-price").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.addCustomPrice();
     });
   }
-  
-  setMode(mode) {
-    this.mode = mode;
-    
-    // 更新按鈕狀態
-    const maxItemsBtn = document.getElementById("mode-max-items");
-    const minLeftBtn = document.getElementById("mode-min-left");
-    
-    maxItemsBtn.classList.toggle("is-active", mode === "max-items");
-    maxItemsBtn.setAttribute("aria-selected", mode === "max-items");
-    minLeftBtn.classList.toggle("is-active", mode === "min-left");
-    minLeftBtn.setAttribute("aria-selected", mode === "min-left");
-    
+
+  addCustomPrice() {
+    const input = document.getElementById("custom-price");
+    const price = parseInt(input.value);
+    if (!price || price <= 0 || price > 9999) return;
+
+    const allPrices = [...this.presetPrices, ...this.customPrices];
+    if (!allPrices.includes(price)) {
+      this.customPrices.push(price);
+    }
+    this.selectedPrices.add(price);
+    input.value = "";
+
+    this.renderPricePills();
+    this.renderSelectedBoard();
     this.updateResults();
   }
-  
-  // Loading 動畫控制
+
+  togglePrice(price) {
+    if (this.selectedPrices.has(price)) {
+      this.selectedPrices.delete(price);
+    } else {
+      this.selectedPrices.add(price);
+    }
+    this.renderPricePills();
+    this.renderSelectedBoard();
+    this.updateResults();
+  }
+
+  setMode(mode) {
+    this.mode = mode;
+
+    const modes = ["max-variety", "min-left", "max-types"];
+    modes.forEach(m => {
+      const btn = document.getElementById(`mode-${m}`);
+      if (btn) {
+        btn.classList.toggle("is-active", mode === m);
+        btn.setAttribute("aria-selected", mode === m);
+      }
+    });
+
+    this.updateResults();
+  }
+
   showLoading() {
     const loading = document.getElementById("loading");
-    if (loading) {
-      loading.style.display = "flex";
-    }
+    if (loading) loading.style.display = "flex";
   }
-  
+
   hideLoading() {
     const loading = document.getElementById("loading");
-    if (loading) {
-      loading.style.display = "none";
-    }
+    if (loading) loading.style.display = "none";
   }
-  
-  // 隱藏結果區域
+
   hideResults() {
-    const toggle = document.querySelector('.toggle');
-    const list = document.querySelector('.list');
-    const remain = document.querySelector('.remain');
-    
-    if (toggle) toggle.style.display = 'none';
-    if (list) list.style.display = 'none';
-    if (remain) remain.style.display = 'none';
+    const panel = document.querySelector(".panel");
+    if (panel) panel.style.display = "none";
   }
-  
-  // 顯示結果區域
+
   showResults() {
-    const toggle = document.querySelector('.toggle');
-    const list = document.querySelector('.list');
-    const remain = document.querySelector('.remain');
-    
-    if (toggle) toggle.style.display = 'flex';
-    if (list) list.style.display = 'flex';
-    if (remain) remain.style.display = 'flex';
+    const panel = document.querySelector(".panel");
+    const toggle = document.querySelector(".toggle");
+    const list = document.querySelector(".list");
+    const remain = document.querySelector(".remain");
+    if (panel) panel.style.display = "flex";
+    if (toggle) toggle.style.display = "flex";
+    if (list) list.style.display = "flex";
+    if (remain) remain.style.display = "flex";
   }
-  
-  renderPriceOptions() {
-    const container = document.getElementById("price-options");
-    const prices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
-    
-    // 建立所有價格 checkbox
-    prices.forEach(price => {
-      const checkbox = document.createElement("div");
-      checkbox.className = "checkbox";
-      
-      const input = document.createElement("input");
-      input.type = "checkbox";
-      input.id = `price-${price}`;
-      input.checked = [21, 23, 32, 33, 34, 35, 41].includes(price); // 預設選中
-      
-      const label = document.createElement("label");
-      label.htmlFor = `price-${price}`;
-      label.textContent = `${price}元`;
-      
-      checkbox.appendChild(input);
-      checkbox.appendChild(label);
-      
-      // 監聽選中狀態變化
-      input.addEventListener("change", (e) => {
-        if (e.target.checked) {
-          this.selectedPrices.add(price);
-        } else {
-          this.selectedPrices.delete(price);
-        }
-        
-        // 檢查是否需要取消全選
-        this.updateSelectAllState();
-        
-        this.updateResults();
+
+  renderPricePills() {
+    const container = document.getElementById("price-pills");
+    container.innerHTML = "";
+
+    const allPrices = [...this.presetPrices, ...this.customPrices]
+      .sort((a, b) => a - b)
+      .filter(price => !this.selectedPrices.has(price));
+
+    allPrices.forEach(price => {
+      const pill = document.createElement("button");
+      pill.className = "price-pill";
+      pill.type = "button";
+      pill.setAttribute("aria-pressed", "false");
+
+      const numEl = document.createElement("span");
+      numEl.className = "pill-num";
+      numEl.textContent = price;
+
+      const unitEl = document.createElement("span");
+      unitEl.className = "pill-unit";
+      unitEl.textContent = "元";
+
+      const addIcon = document.createElement("span");
+      addIcon.className = "pill-icon--add";
+      addIcon.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v12M1 7h12" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+      const removeIcon = document.createElement("span");
+      removeIcon.className = "pill-icon--remove";
+      removeIcon.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 7h12" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+      pill.appendChild(numEl);
+      pill.appendChild(unitEl);
+      pill.appendChild(addIcon);
+      pill.appendChild(removeIcon);
+      // 藥丸只允許新增（刪除改由「你選取了」區塊的 × 操作）
+      pill.addEventListener("click", () => {
+        if (!this.selectedPrices.has(price)) this.togglePrice(price);
       });
-      
-      // 初始化選中狀態
-      if (input.checked) {
-        this.selectedPrices.add(price);
-      }
-      
-      container.appendChild(checkbox);
+      container.appendChild(pill);
     });
-    
-    // 初始化全選狀態
-    this.updateSelectAllState();
   }
-  
-  updateSelectAllState() {
-    const selectAllInput = document.getElementById("select-all");
-    const prices = [17, 18, 21, 23, 24, 25, 27, 32, 33, 34, 35, 41, 53];
-    
-    // 檢查是否所有價格都被選中
-    const allSelected = prices.every(price => this.selectedPrices.has(price));
-    
-    // 更新全選 checkbox 狀態
-    if (selectAllInput) {
-      selectAllInput.checked = allSelected;
-      selectAllInput.indeterminate = !allSelected && this.selectedPrices.size > 0;
-    }
+
+  renderSelectedBoard() {
+    const container = document.getElementById("selected-list");
+    container.innerHTML = "";
+
+    const selected = [...this.selectedPrices].sort((a, b) => b - a);
+
+    selected.forEach(price => {
+      const box = document.createElement("div");
+      box.className = "big-price-box";
+
+      const val = document.createElement("span");
+      val.className = "big-price-val";
+      val.textContent = price;
+
+      const unit = document.createElement("span");
+      unit.className = "big-price-unit";
+      unit.textContent = "元";
+
+      const removeBtn = document.createElement("div");
+      removeBtn.className = "big-price-remove";
+      removeBtn.setAttribute("aria-label", `移除 ${price} 元`);
+      removeBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L11 11M11 1L1 11" stroke="#7a7a7a" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+      removeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.togglePrice(price);
+      });
+
+      box.appendChild(val);
+      box.appendChild(unit);
+      box.appendChild(removeBtn);
+      container.appendChild(box);
+    });
   }
-  
+
   calculateOptimalPurchase() {
     if (this.amount <= 0 || this.selectedPrices.size === 0) {
       return { items: [], remaining: this.amount };
     }
-    
+
     const prices = Array.from(this.selectedPrices).sort((a, b) => a - b);
     let remaining = this.amount;
     const items = [];
-    
-    if (this.mode === "max-items") {
-      // 買最多品項：優先買便宜的
+
+    if (this.mode === "max-variety") {
+      // 買最多樣：優先買便宜的，同一種買最多
       for (const price of prices) {
-        const maxQuantity = Math.floor(remaining / price);
-        if (maxQuantity > 0) {
-          items.push({ price, quantity: maxQuantity });
-          remaining -= price * maxQuantity;
+        const qty = Math.floor(remaining / price);
+        if (qty > 0) {
+          items.push({ price, quantity: qty });
+          remaining -= price * qty;
         }
       }
-    } else {
+    } else if (this.mode === "min-left") {
       // 剩餘最少錢：優先買貴的
       for (let i = prices.length - 1; i >= 0; i--) {
         const price = prices[i];
-        const maxQuantity = Math.floor(remaining / price);
-        if (maxQuantity > 0) {
-          items.push({ price, quantity: maxQuantity });
-          remaining -= price * maxQuantity;
+        const qty = Math.floor(remaining / price);
+        if (qty > 0) {
+          items.push({ price, quantity: qty });
+          remaining -= price * qty;
+        }
+      }
+    } else if (this.mode === "max-types") {
+      // 買最多種：每種各買1個（由便宜到貴），買最多不同種類
+      for (const price of prices) {
+        if (remaining >= price) {
+          items.push({ price, quantity: 1 });
+          remaining -= price;
+        }
+      }
+      // 剩餘金額補買最便宜的
+      if (remaining > 0 && items.length > 0) {
+        const cheapest = items[0];
+        const extra = Math.floor(remaining / cheapest.price);
+        if (extra > 0) {
+          cheapest.quantity += extra;
+          remaining -= extra * cheapest.price;
         }
       }
     }
-    
+
     return { items, remaining };
   }
-  
-  // 一般更新結果（用於輸入和模式切換）
+
   updateResults() {
     const result = this.calculateOptimalPurchase();
     this.renderResults(result.items);
     this.updateRemaining(result.remaining);
   }
-  
-  // 帶 loading 的更新結果（用於按鈕點擊）
+
   async updateResultsWithLoading() {
-    // 隱藏結果區域並顯示 loading
     this.hideResults();
     this.showLoading();
-    
-    // 模擬計算延遲（讓 loading 動畫有時間顯示）
+
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     const result = this.calculateOptimalPurchase();
     this.renderResults(result.items);
     this.updateRemaining(result.remaining);
-    
-    // 隱藏 loading 並顯示結果
+
     this.hideLoading();
     this.showResults();
   }
-  
+
   renderResults(items) {
     const container = document.getElementById("result-list");
     container.innerHTML = "";
-    
+
     if (items.length === 0) {
-      container.innerHTML = "<div class=\"no-results\" role=\"status\" aria-live=\"polite\">無法購買任何品項</div>";
+      container.innerHTML = "<div class=\"no-results\" role=\"status\">無法購買任何品項</div>";
       return;
     }
-    
+
     items.forEach((item, index) => {
-      // 如果不是第一個項目，先添加分隔符號
       if (index > 0) {
         const separator = document.createElement("div");
-        separator.className = "multiplier";
+        separator.className = "multiplier separator";
         separator.textContent = "＋";
         container.appendChild(separator);
       }
-      
+
       const unit = document.createElement("div");
       unit.className = "unit";
-      
+
       const priceBox = document.createElement("div");
       priceBox.className = "price-box";
-      
+
       const priceVal = document.createElement("div");
       priceVal.className = "price-val";
       priceVal.textContent = item.price;
-      
+
       const priceUnit = document.createElement("div");
       priceUnit.className = "price-unit";
       priceUnit.textContent = "元";
-      
+
       const multiplier = document.createElement("div");
       multiplier.className = "multiplier";
       multiplier.textContent = "×";
-      
+
       const quantity = document.createElement("div");
       quantity.className = "quantity";
       quantity.textContent = item.quantity;
-      
+
       priceBox.appendChild(priceVal);
       priceBox.appendChild(priceUnit);
-      
       unit.appendChild(priceBox);
       unit.appendChild(multiplier);
       unit.appendChild(quantity);
-      
+
       container.appendChild(unit);
     });
   }
-  
+
   updateRemaining(amount) {
     const remainPrice = document.getElementById("remain-price");
     const priceVal = remainPrice.querySelector(".price-val");
